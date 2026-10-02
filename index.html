@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Esto es para ti...</title>
+<style>
+:root{color-scheme:dark;--bg:#100b13;--surface:#1d121d;--text:#fff5fa;--muted:#d8becd;--accent:#ff7fa8;--accent2:#ffb6ca;--line:#ffffff1a}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Georgia,'Times New Roman',serif}
+button{font:inherit}
+#app{min-height:100vh;background:radial-gradient(circle at 50% 15%,#3b1d31 0,#170d18 42%,#0c080e 100%);overflow:hidden}
+.screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:32px;position:relative}
+.hidden{display:none!important}
+.stars,.hearts{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.star{position:absolute;width:3px;height:3px;background:#fff;border-radius:50%;opacity:.65;animation:twinkle 3s infinite ease-in-out}
+.heart{position:absolute;color:#ff8db0;opacity:0;animation:float 8s linear infinite}
+.hero{text-align:center;max-width:760px;position:relative;z-index:2}
+.eyebrow{color:var(--accent2);letter-spacing:4px;text-transform:uppercase;font-size:.75rem}
+.hero h1{font-size:clamp(3rem,9vw,6.8rem);font-weight:400;margin:18px 0 10px;line-height:.95}
+.hero p{font-size:clamp(1.05rem,2vw,1.35rem);color:var(--muted);font-style:italic;max-width:560px;margin:0 auto 35px;line-height:1.7}
+.btn{border:1px solid #ff9fba66;background:#ff7fa81c;color:white;border-radius:999px;padding:14px 28px;cursor:pointer;transition:.3s;box-shadow:0 0 30px #ff5f9520}
+.btn:hover{transform:translateY(-3px);background:#ff7fa836;box-shadow:0 0 40px #ff5f9540}
+.btn span{color:var(--accent2)}
+#content{max-width:1050px;margin:auto;padding:70px 24px 100px;position:relative}
+.top{text-align:center;margin-bottom:60px}
+.top h2{font-size:clamp(2.2rem,5vw,4rem);font-weight:400;margin:10px 0}
+.top p{color:var(--muted);line-height:1.7}
+.music{position:fixed;right:20px;top:20px;z-index:10;background:#ffffff12;border:1px solid var(--line);backdrop-filter:blur(12px);color:white;border-radius:999px;padding:10px 15px;cursor:pointer}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+.card{background:linear-gradient(145deg,#ffffff0d,#ffffff04);border:1px solid var(--line);border-radius:24px;padding:28px;min-height:190px;box-shadow:0 20px 50px #0003;cursor:pointer;transition:.35s;position:relative;overflow:hidden}
+.card:hover{transform:translateY(-7px);border-color:#ff9fba66;box-shadow:0 25px 60px #0005,0 0 30px #ff5f9512}
+.card::after{content:'Abrir';position:absolute;right:22px;bottom:18px;color:#ffb6ca;font-size:.8rem;opacity:.7}
+.card .icon{font-size:1.6rem}
+.card h3{font-size:1.45rem;font-weight:400;margin:15px 0 10px}
+.card p{color:var(--muted);line-height:1.7}
+.letter{margin-top:20px;padding:38px;border-radius:28px;background:#ffb0c90b;border:1px solid #ffb0c91c;text-align:left}
+.letter p{max-width:700px;margin:12px auto;color:#ead6df;line-height:1.9;font-size:1.05rem}
+.detail{display:none;position:fixed;inset:0;z-index:30;background:#0c080eeF;backdrop-filter:blur(18px);align-items:center;justify-content:center;padding:24px}
+.detail.active{display:flex}
+.detail-box{width:min(720px,100%);max-height:85vh;overflow:auto;background:linear-gradient(145deg,#291624,#140d15);border:1px solid #ffb0c933;border-radius:30px;padding:40px;box-shadow:0 30px 100px #0009;position:relative;text-align:left;animation:modal .45s ease}
+.detail-box h2{font-size:clamp(2rem,6vw,3.5rem);font-weight:400;margin:12px 0}
+.detail-box p{color:var(--muted);line-height:1.9;font-size:1.08rem}
+.thought-list{display:grid;gap:18px;margin-top:28px;text-align:left}
+.thought-card{background:linear-gradient(145deg,#ffb0c910,#ffffff05);border:1px solid #ffb0c925;border-radius:22px;padding:24px 26px;box-shadow:0 15px 40px #0003}
+.thought-card p{margin:0 0 12px}
+.thought-card p:last-child{margin-bottom:0}
+.thought-card .quote{font-size:1.12rem;color:#f7dce6;font-style:italic}
+.thought-card .author{font-size:.88rem;color:#ffb6ca;text-align:right}
+.close-detail{position:absolute;right:18px;top:15px;border:1px solid var(--line);background:#ffffff0c;color:white;border-radius:50%;width:40px;height:40px;cursor:pointer;font-size:1.2rem}
+@keyframes modal{from{opacity:0;transform:translateY(25px) scale(.97)}to{opacity:1;transform:none}}
+.footer{text-align:center;color:#a98d9b;margin-top:55px;font-size:.9rem}
+.fade{animation:fade .9s ease both}
+@keyframes fade{from{opacity:0;transform:translateY(15px)}to{opacity:1;transform:none}}
+@keyframes twinkle{50%{opacity:.15;transform:scale(.7)}}
+@keyframes float{0%{transform:translateY(105vh) rotate(0);opacity:0}15%{opacity:.5}100%{transform:translateY(-10vh) rotate(35deg);opacity:0}}
+@media(max-width:700px){.grid{grid-template-columns:1fr}.screen{padding:24px}.hero h1{font-size:3.8rem}.card{padding:24px}}
+</style>
+</head>
+
+<body>
+
+<div id="app">
+
+  <div id="stars" class="stars"></div>
+  <div id="hearts" class="hearts"></div>
+
+  <section id="welcome" class="screen">
+
+    <div class="hero fade">
+
+      <div class="eyebrow">hecho especialmente para ti</div>
+
+      <h1>Esto es para ti...</h1>
+
+      <p>
+        Hay cosas que a veces son difíciles de decir en voz alta.
+        Así que decidí guardarlas aquí, en un pequeño lugar que solamente quería hacer para ti.
+      </p>
+
+      <button class="btn" id="openBtn">
+        Abrir <span>♡</span>
+      </button>
+
+    </div>
+
+  </section>
+
+  <main id="content" class="hidden">
+
+    <button class="music" id="musicBtn">♫ Música</button>
+
+    <div class="top fade">
+
+      <div class="eyebrow">un pequeño rincón para nosotros</div>
+
+      <h2>Me gustaría decirte algo...</h2>
+
+      <p>
+        Esto apenas comienza. Por ahora, aquí guardé algunas de las cosas que quiero compartir contigo.
+      </p>
+
+    </div>
+
+    <div class="grid">
+
+      <article class="card fade detail-card" data-detail="thoughts">
+        <div class="icon">♡</div>
+        <h3>Lo que pienso de ti</h3>
+        <p>Hay cosas que prefiero guardar aquí...</p>
+      </article>
+
+      <article class="card fade detail-card" data-detail="dreams">
+        <div class="icon">✦</div>
+        <h3>Mis sueños contigo</h3>
+        <p>Todo aquello que algún día podríamos vivir...</p>
+      </article>
+
+      <article class="card fade detail-card" data-detail="moments">
+        <div class="icon">☾</div>
+        <h3>Gracias por llegar a mi vida</h3>
+        <p>Gracias por cada momento compartido...</p>
+      </article>
+
+      <article class="card fade detail-card" data-detail="future">
+        <div class="icon">∞</div>
+        <h3>Si pudiera pedir un deseo</h3>
+        <p>Si pudiera pedir un deseo...</p>
+      </article>
+
+    </div>
+
+    <div id="detail" class="detail">
+
+      <div class="detail-box">
+
+        <button class="close-detail" id="closeDetail">×</button>
+
+        <div id="detailIcon" class="icon"></div>
+
+        <h2 id="detailTitle"></h2>
+
+        <div id="detailText"></div>
+
+      </div>
+
+    </div>
+
+    <section class="letter fade">
+
+      <div class="eyebrow">para ti</div>
+
+      <h2>Esta carta es para ti</h2>
+
+      <p>Una carta para ti</p>
+
+      <p>
+        Si llegaste hasta aquí, quiero que sepas que cada palabra que has leído nació de algo que siento de verdad.
+      </p>
+
+      <p>
+        Quizá muchas veces no encuentro la manera correcta de decirte todo lo que significas para mí.
+        Hay sentimientos que simplemente son demasiado grandes para explicarlos con unas cuantas palabras,
+        pero hoy quiero intentarlo.
+      </p>
+
+      <p>Quiero que sepas que te quiero muchísimo.</p>
+
+      <p>
+        Te quiero por quien eres, por tu manera de ser, por tus pequeños detalles,
+        por tu sonrisa, por la forma en la que haces que un momento cualquiera pueda convertirse
+        en uno de mis momentos favoritos.
+      </p>
+
+      <p>
+        Te quiero incluso en esos días en los que quizá tú no puedas ver todo lo bonito que hay en ti.
+        Y si alguna vez llegas a dudar de lo especial que eres, quiero estar ahí para recordártelo.
+      </p>
+
+      <p>
+        No quiero prometerte una historia perfecta, porque sé que ninguna historia lo es.
+        Lo que sí quiero es hacer las cosas bien.
+        Quiero cuidarte, respetarte, escucharte, apoyarte, crecer contigo y quererte muchísimo.
+      </p>
+
+      <p>
+        Quiero estar para tus alegrías y también para esos días en los que necesites
+        que alguien simplemente se quede a tu lado.
+      </p>
+
+      <p>
+        Quiero conocer cada versión de ti que la vida vaya formando.
+        Quiero verte cumplir tus sueños, acompañarte en tus metas y sentirme orgulloso
+        de la persona en la que te vas convirtiendo.
+      </p>
+
+      <p>
+        Y si algún día la vida se pone difícil, quiero que recuerdes que hubo alguien
+        que creyó en ti incluso cuando tú misma no lo hacías.
+      </p>
+
+      <p>Tú eres una de esas personas que uno agradece haber conocido.</p>
+
+      <p>
+        No sé qué nos tenga preparado el futuro.
+        No sé cuántas páginas nos queden por escribir ni qué historias nos tocará vivir.
+        Pero mientras pueda elegir, quiero seguir escribiendo algunas de ellas contigo.
+      </p>
+
+      <p>
+        Quiero más fotografías, más conversaciones, más risas, más aventuras,
+        más abrazos, más momentos que solamente tú y yo podamos entender.
+      </p>
+
+      <p>Quiero que algún día podamos mirar atrás y decir:</p>
+
+      <p>“Mira todo lo que vivimos juntos.”</p>
+
+      <p>Y quizá ese sea uno de mis sueños más grandes contigo.</p>
+
+      <p>
+        No quiero que esta carta sea solamente algo bonito que leas hoy.
+        Quiero que, cuando la vuelvas a leer en algún momento, recuerdes que hubo un día
+        en el que alguien se sentó a escribir todo esto porque sentía algo demasiado grande
+        por ti y necesitaba encontrar una forma de decírtelo.
+      </p>
+
+      <p>Así que, si alguna vez te preguntas qué significas para mí, vuelve aquí.</p>
+
+      <p>Lee estas palabras otra vez.</p>
+
+      <p>
+        Y recuerda que, entre tantas personas, mi corazón tuvo la suerte de encontrarte a ti.
+      </p>
+
+      <p>Gracias por existir.</p>
+
+      <p>Gracias por llegar a mi vida.</p>
+
+      <p>Gracias por cada momento.</p>
+
+      <p>Y gracias por permitirme quererte.</p>
+
+      <p>
+        Te quiero hoy, te quiero en mis sueños y espero poder seguir queriéndote
+        en todos los días que todavía nos quedan por vivir.
+      </p>
+
+      <p>Con todo mi amor,</p>
+
+      <p>Josue</p>
+
+    </section>
+
+    <div class="footer">Hecho con cariño ♡</div>
+
+  </main>
+
+</div>
+
+<audio id="music" loop preload="none">
+  <source src="musica.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+
+const stars = document.getElementById('stars'),
+      hearts = document.getElementById('hearts');
+
+for(let i = 0; i < 70; i++){
+
+  const s = document.createElement('i');
+
+  s.className = 'star';
+
+  s.style.left = Math.random() * 100 + '%';
+  s.style.top = Math.random() * 100 + '%';
+  s.style.animationDelay = Math.random() * 3 + 's';
+
+  stars.appendChild(s);
+}
+
+for(let i = 0; i < 12; i++){
+
+  const h = document.createElement('span');
+
+  h.className = 'heart';
+  h.textContent = '♡';
+
+  h.style.left = Math.random() * 100 + '%';
+  h.style.fontSize = (12 + Math.random() * 20) + 'px';
+  h.style.animationDelay = Math.random() * 8 + 's';
+
+  hearts.appendChild(h);
+}
+
+const welcome = document.getElementById('welcome'),
+      content = document.getElementById('content'),
+      music = document.getElementById('music'),
+      musicBtn = document.getElementById('musicBtn');
+
+music.volume = 0;
+
+function fadeInMusic(){
+
+  music.volume = 0;
+
+  music.play().catch(() => {});
+
+  let volume = 0;
+
+  const fade = setInterval(() => {
+
+    volume += 0.02;
+
+    if(volume >= 0.5){
+
+      volume = 0.5;
+      clearInterval(fade);
+
+    }
+
+    music.volume = volume;
+
+  }, 100);
+
+}
+
+const detail = document.getElementById('detail'),
+      detailTitle = document.getElementById('detailTitle'),
+      detailIcon = document.getElementById('detailIcon'),
+      detailText = document.getElementById('detailText');
+
+const details = {
+
+  thoughts:{
+    icon:'',
+    title:'Lo que pienso de ti',
+    text:`
+      <div class="thought-list">
+
+        <article class="thought-card">
+
+          <p>Lo que pienso de ti</p>
+
+          <p>
+            Pienso que eres una persona increíble, de esas que llegan a la vida sin avisar
+            y poco a poco terminan ocupando un lugar que ya no quieres que nadie más ocupe.
+          </p>
+
+          <p>
+            Pienso en tu sonrisa más de lo que imaginas.
+            Hay algo en ella que puede cambiar por completo mi día,
+            incluso cuando las cosas no están saliendo como esperaba.
+          </p>
+
+          <p>
+            Pienso que tienes una forma muy especial de hacerme sentir.
+            Contigo puedo ser yo mismo, hablar de cualquier cosa,
+            reírme de tonterías y simplemente disfrutar el momento.
+          </p>
+
+          <p>
+            Pienso que eres mucho más de lo que ves en ti misma.
+            Yo puedo encontrar en ti cosas bonitas que quizá tú no siempre alcanzas a notar:
+            tu forma de ser, tus pequeños detalles, tu manera de expresarte
+            y todo aquello que te hace ser tú.
+          </p>
+
+          <p>
+            Pienso que conocerte ha sido algo muy bonito.
+            Cada conversación, cada momento y cada recuerdo contigo
+            se ha ido convirtiendo en una pequeña parte de algo que para mí significa muchísimo.
+          </p>
+
+          <p>
+            Pienso que me gusta quererte.
+            Me gusta preocuparme por ti, saber cómo estás, escucharte,
+            apoyarte y encontrar cualquier excusa para hacerte sonreír.
+          </p>
+
+          <p>
+            Y sobre todo, pienso que eres alguien muy especial para mí.
+            No por ser perfecta, sino porque eres tú.
+            Y entre tantas personas, fue precisamente contigo con quien mi corazón
+            encontró un lugar donde quería quedarse.
+          </p>
+
+        </article>
+
+      </div>
+    `
+  },
+
+  dreams:{
+    icon:'',
+    title:'Mis sueños contigo',
+    text:`
+      <p>Mis sueños contigo</p>
+
+      <p>
+        Quiero construir contigo algo bonito, algo que no se quede solamente en palabras,
+        sino que podamos demostrar día con día con pequeños detalles, paciencia,
+        cariño y mucho amor.
+      </p>
+
+      <p>
+        Mi sueño es compartir contigo muchos momentos, desde los más sencillos
+        hasta aquellos que algún día recordemos con una sonrisa.
+        Quiero reír contigo, acompañarte en tus días buenos
+        y estar a tu lado cuando las cosas no sean tan fáciles.
+      </p>
+
+      <p>
+        Sueño con crecer contigo, aprender juntos, apoyarnos en nuestros sueños
+        y celebrar cada pequeño logro como si fuera de los dos.
+        Porque quiero verte cumplir todo aquello que te hace feliz
+        y, si tú me lo permites, caminar a tu lado mientras lo haces.
+      </p>
+
+      <p>
+        Quiero conocer muchos lugares contigo, descubrir nuevos rincones,
+        tomar fotografías, crear recuerdos y tener historias que algún día podamos contar
+        diciendo: <em>“¿te acuerdas de aquel día?”</em>
+      </p>
+
+      <p>
+        Sueño con una vida llena de momentos contigo, no necesariamente perfecta,
+        porque sé que habrá días difíciles, pero sí una vida en la que podamos elegirnos,
+        cuidarnos, escucharnos y seguir aprendiendo a querernos.
+      </p>
+
+      <p>
+        Mi objetivo contigo es hacer las cosas bien: cuidarte, crecer juntos y quererte mucho.
+        Quiero que sepas que mis sueños no solamente hablan de lo que quiero vivir,
+        sino también de la persona con quien quiero compartirlo.
+      </p>
+
+      <p>
+        Y si algún día me preguntas cuál es uno de mis sueños más grandes...
+        probablemente te diría que es seguir encontrando nuevas razones
+        para sonreír cuando estoy contigo.
+      </p>
+    `
+  },
+
+  moments:{
+    icon:'',
+    title:'Gracias por llegar a mi vida',
+    text:`
+      <p>Gracias por llegar a mi vida</p>
+
+      <p>
+        Gracias por aparecer en mi vida y convertir momentos normales
+        en recuerdos que ahora significan muchísimo para mí.
+      </p>
+
+      <p>
+        Gracias por cada sonrisa, cada conversación, cada detalle
+        y cada instante que has compartido conmigo.
+        Quizá para ti algunos de esos momentos parezcan pequeños,
+        pero para mí tienen un valor enorme.
+      </p>
+
+      <p>
+        Gracias por dejarme conocerte, por permitirme descubrir poco a poco
+        esa persona tan especial que eres y por regalarme la oportunidad
+        de compartir una parte de mi vida contigo.
+      </p>
+
+      <p>No sé exactamente qué nos espera en el futuro, pero sí sé algo:</p>
+
+      <p>Quiero seguir creando recuerdos contigo.</p>
+
+      <p>
+        Quiero que algún día podamos mirar hacia atrás y recordar todo lo que hemos vivido,
+        las risas, los momentos difíciles, las aventuras y todas esas pequeñas cosas
+        que hicieron especial nuestra historia.
+      </p>
+
+      <p>Y si hay algo que deseo que nunca olvides, es esto:</p>
+
+      <p>
+        Me alegra muchísimo que seas parte de mi vida.
+        Y espero poder seguir siendo parte de la tuya por mucho, mucho tiempo.
+      </p>
+    `
+  },
+
+  future:{
+    icon:'',
+    title:'Si pudiera pedir un deseo',
+    text:`
+      <p>Si pudiera pedir un deseo</p>
+
+      <p>
+        Si pudiera pedir un deseo, no pediría una vida perfecta.
+      </p>
+
+      <p>
+        Pediría tener la oportunidad de seguir compartiendo momentos contigo.
+      </p>
+
+      <p>
+        Pediría poder verte cumplir tus sueños, estar ahí para celebrar tus logros
+        y poder abrazarte cuando las cosas no salgan como esperabas.
+      </p>
+
+      <p>
+        Pediría más días contigo, más conversaciones, más risas,
+        más fotografías, más aventuras y más recuerdos que podamos guardar para siempre.
+      </p>
+
+      <p>Pediría tiempo.</p>
+
+      <p>
+        Tiempo para conocerte cada día un poquito más,
+        para aprender a quererte mejor y para demostrarte con hechos
+        todo aquello que muchas veces las palabras no pueden explicar.
+      </p>
+
+      <p>Y si pudiera pedir algo más...</p>
+
+      <p>
+        Pediría que, sin importar cuánto tiempo pase,
+        nunca dejemos de encontrar motivos para elegirnos,
+        cuidarnos y hacernos felices.
+      </p>
+    `
+  }
+
+};
+
+document.querySelectorAll('.detail-card').forEach(card => {
+
+  card.addEventListener('click', () => {
+
+    const d = details[card.dataset.detail];
+
+    detailIcon.textContent = d.icon;
+    detailTitle.textContent = d.title;
+    detailText.innerHTML = d.text;
+
+    detail.classList.add('active');
+
+    document.body.style.overflow = 'hidden';
+
+  });
+
+});
+
+document.getElementById('closeDetail').addEventListener('click', () => {
+
+  detail.classList.remove('active');
+
+  document.body.style.overflow = 'auto';
+
+});
+
+detail.addEventListener('click', e => {
+
+  if(e.target === detail){
+
+    detail.classList.remove('active');
+
+    document.body.style.overflow = 'auto';
+
+  }
+
+});
+
+document.getElementById('openBtn').addEventListener('click', () => {
+
+  welcome.classList.add('hidden');
+  content.classList.remove('hidden');
+
+  document.body.style.overflow = 'auto';
+
+  fadeInMusic();
+
+  window.scrollTo(0,0);
+
+});
+
+musicBtn.addEventListener('click', () => {
+
+  if(music.paused){
+
+    music.play().catch(() => {});
+
+    musicBtn.textContent = '♫ Música: encendida';
+
+  }else{
+
+    music.pause();
+
+    musicBtn.textContent = '♫ Música: pausada';
+
+  }
+
+});
+
+</script>
+
+</body>
+</html>
